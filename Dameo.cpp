@@ -26,7 +26,7 @@ using namespace std;
 #define BOLDWHITE   "\033[1m\033[37m"      /* Bold White */
  
 #define CLEAR "\033[2J"  // clear screen escape code 
-const int H = 11;
+const int H = 8;
  char P1= 'x';
  char P2= 'o';
 const int ecart_it = 0; /// c'est lécart parametrable entre les deux jopueur
@@ -38,45 +38,56 @@ Damier::Damier()
 {
 	Dam.resize( H , vector<char>( H , '0' ) );
 }
-
+Damier::~Damier()
+{
+	Dam.clear();
+}
 void Damier::Remplir_plateau()
 {
-int t = Dam.size()-1; 	//Taille tableau
-int T = Dam.size();
-int med, row, xow;
-if(T%2==0){				//paire 
-	 med=T/2;
-	 row = med-1-ecart_it;			//Parametre de safezone P2
-	 xow = t-row;					//Parametre de safezone P1
-}
-else{ 
-	med = (T/2)+1;
-	row = med-2 - ecart_it;
-	xow = t-row;
-}
- for(int i = 0 ; i <= t ; i++)
-  {
-  	while(i > row && i < xow ) i++;
-    for(int j = 0 ; j <= t ; j++)
-    {
-   
-     if(i == 0)	Dam[i][j] = P2 ;
-      
-     if(i == t)	Dam[i][j] = P1 ;
-     if(i != 0 || i != t) 
-     {
-          if(i < row)
+	nbpion = 0;
+	int t = Dam.size()-1; 	//Taille tableau
+	int T = Dam.size();
+	int med, row, xow;
+	if(T%2==0){				//paire 
+		 med=T/2;
+		 row = med-1-ecart_it;			//Parametre de safezone P2
+		 xow = t-row;					//Parametre de safezone P1
+	}
+		else{ 
+		med = (T/2)+1;
+		row = med-2 - ecart_it;
+		xow = t-row;
+	}
+
+	 for(int i = 0 ; i <= t ; i++)
+	  {
+  		while(i > row && i < xow ) i++;
+  	  for(int j = 0 ; j <= t ; j++)
+  	  {	  
+     	if(i == 0){
+     		Dam[i][j] = P2; 
+  	  		//nbpion++;
+   		  } 
+    	 if(i == t){
+    	 	Dam[i][j] = P1 ;
+    	 	//nbpion++;
+    	 	}
+    	 if(i != 0 || i != t) 
+    	 {
+     	     if(i < row)
           {
-            if(j >= i && j <= t-i)
+     	       if(j >= i && j <= t-i)
             {
-             Dam[i][j] = P2 ;
+        	     Dam[i][j] = P2 ;
+        	    // nbpion++;
             }
           }
-          if(i > xow)
+        	  if(i > xow)
           {
             if(j > t-(i+1) && j < t-(t-(i+1)))
             {
               Dam[i][j] = P1 ;
+              //nbpion++;
             }
           }
       }
@@ -129,6 +140,25 @@ void Damier::Affiche()
 			cout<<endl;
 		
 }
+int Damier::getP()
+{
+	int pions =0;
+	for(int i = 0 ; i<= Dam.size()-1; i++)
+	{
+		for(int j=0; j<= Dam.size()-1 ; j++)
+		{
+			if(Dam[i][j] == P1)	pions++;
+		}
+	}
+	cout <<"Il y a tant pion : "<<pions<<endl;
+	return pions;
+}
+
+
+vector <vector <char> > Damier::get_DamSize()
+{
+	return Dam;
+}
 
 char Damier::Affiche_Couleur(int i, int j)
 {
@@ -141,49 +171,66 @@ char Damier::Affiche_Couleur(int i, int j)
 }
 //---------------------------------------------------------|||||||||||------------Le joueur-------------------------
 //---------------------------------------------------------|||||||||||||-----------------------------------------------------------
-Joueur::Joueur() //: nb_pion(H*2)
+Joueur::Joueur(int serv) //: nb_pion(H*2)
 {
 //	pair < pair<int,int>,bool>  P( pair < pair <int,int>, bool> (pair <int,int> (0,0) ,false) ); 
 //	pair<int,int> P(0,0);
-	Pion.resize( 18 , pair< pair <int ,int  > , bool >( pair<int,int> (0,0) , false) );
+	this->pion = serv ;
+	Tion.resize( this->pion , pair< pair <int ,int  > , bool >( pair<int,int> (0,0) , false) );
 
+}
+Joueur::~Joueur()
+{
+	Tion.clear();
 }
 
 void Joueur::Affiche()
 {
-	for(int i = 0 ; i<=Pion.size()-1 ; i++)
+	for(int i = 0 ; i<=Tion.size()-1 ; i++)
 	{
-		cout<<Pion[i].second;
-		cout<<Pion[i].first.first;
-		cout<<Pion[i].first.second;
+		cout<<i<<" ";
+
+		cout<<Tion[i].first.first;
+		cout<<Tion[i].first.second;
+		cout<<Tion[i].second;
 		cout<<endl;
 	}
 }
-/*
-void Joueur::get_Pion(Joueur O)
+
+void Joueur::get_Pion(vector <vector<char> > S, char P)
 {
 	int pions =0;
-	for(int i = 0 ; i<=Dam.size()-1 ; i++)
+	for(int i = 0 ; i<= S.size()-1; i++)
 	{
-		for(int j=0; j<= Dam.size()-1; j++)
+		for(int j=0; j<= S.size()-1 ; j++)
 		{
-			if(Dam[i][j] == P1){
-				Pion[pions].first.first = i;
-				Pion[pions].first.second = j;
-				}
-			if(Dam[i][j] == P2){
-				Pion[pions].first.first = i;
-				Pion[pions].first.second = j;
+			if(S[i][j] == P){
+				Tion[pions].first.first = i;
+				Tion[pions].first.second = j;
+				//cout <<i <<"  "<< j<<endl;
+				pions++;
 				}
 		}
-
 	}
+	this->pion = pions;
 }
 
-void Joueur::Modify()
+void Joueur::Perpion(int x, int y)
 {
-	inf='x';
-	couleur = 
+	for(int i= 0 ; i<=Tion.size()-1 ; i++)
+	{
+		if(Tion[i].first == x && Tion[i].first.second == y)
+		{
+			swap(Tion.end(),Tion[i]);
+			Tion.pop_back();
+		}
+	}
+}
+/*
+void Joueur::save(int x , int y , char P)
+{
+	if(
+	int = 
 }
 */
 
@@ -198,10 +245,19 @@ int main()
 	//	Dameo.Affiche();
 		Dameo.Remplir_plateau();
 		Dameo.Affiche();
- 	//	Joueur J1;
- 	//	Joueur J2;
- 	//	J1.get_pion
- 	//	J1.Affiche();
+
+		vector <vector<char> > Size = Dameo.get_DamSize();
+		int serv = Dameo.getP();
+		cout <<serv<<endl;
+
+ 		Joueur J1(serv);
+ 	//	Joueur J2(serv);
+ 		
+ 		J1.get_Pion(Size, P1);
+ 	//	J2.get_Pion(Size, P2);
+ 	//	J2.Affiche();
+ 		J1.Perpion(0,1);
+ 		J1.Affiche();
 		cout << endl;
 
     return 0;

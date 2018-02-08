@@ -5,29 +5,35 @@
 #include <vector>
 #include <utility>
 
-class Joueur
-{
-	std::vector <std::pair <std::pair<int,int> ,bool> > Pion; 
-	friend class Damier; 
-	char inf;
-	public:
-		Joueur();
-		void Affiche();
-		void get_Pion(Joueur O);
-};
-
 class Damier
 {
 	std::vector <std::vector <char> > Dam ; 
 	friend class Joueur;
-	int nb_pion;
+	int nbpion = 0;
 	public:
 		Damier();
 		void Affiche();
 		char Affiche_Couleur(int i, int j);
 		void Remplir_plateau();
-		//virtual ~Damier();
+		std::vector <std::vector <char> > get_DamSize();
+		int getP();
+		~Damier();
 
 };
+
+class Joueur
+{
+	std::vector <std::pair <std::pair<int,int> ,bool> > Tion; 
+	friend class Damier; 
+	int pion;
+	char *J;			//caractere de jeu
+	public:
+		Joueur(int s);
+		void Affiche();
+		void get_Pion(std::vector <std::vector <char> > Dam , char P);
+		void Perpion(int x, int y);
+		~Joueur();
+};
+
 
 #endif
