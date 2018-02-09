@@ -190,9 +190,9 @@ void Joueur::Affiche()
 	{
 		cout<<i<<" ";
 
-		cout<<Tion[i].first.first;
+		cout<<Tion[i].first.first<<",";
 		cout<<Tion[i].first.second;
-		cout<<Tion[i].second;
+	//	cout<<Tion[i].second;
 		cout<<endl;
 	}
 }
@@ -207,7 +207,6 @@ void Joueur::get_Pion(vector <vector<char> > S, char P)
 			if(S[i][j] == P){
 				Tion[pions].first.first = i;
 				Tion[pions].first.second = j;
-				//cout <<i <<"  "<< j<<endl;
 				pions++;
 				}
 		}
@@ -215,13 +214,16 @@ void Joueur::get_Pion(vector <vector<char> > S, char P)
 	this->pion = pions;
 }
 
-void Joueur::Perpion(int x, int y)
+
+void Joueur::Suppression(int x, int y)
 {
-	for(int i= 0 ; i<=Tion.size()-1 ; i++)
+	for(int i = 0 ; i<=Tion.size()-1 ; i++)
 	{
-		if(Tion[i].first == x && Tion[i].first.second == y)
+		if(Tion[i].first.first == x && Tion[i].first.second == y)
 		{
-			swap(Tion.end(),Tion[i]);
+			Tion[i].first.first = Tion[this->pion-1].first.first ;
+			Tion[i].first.second = Tion[this->pion-1].first.second ;
+			Tion[i].second = Tion[this->pion-1].second ;
 			Tion.pop_back();
 		}
 	}
@@ -255,8 +257,8 @@ int main()
  		
  		J1.get_Pion(Size, P1);
  	//	J2.get_Pion(Size, P2);
- 	//	J2.Affiche();
- 		J1.Perpion(0,1);
+ 		J1.Affiche();
+ 		J1.Suppression(6,5);
  		J1.Affiche();
 		cout << endl;
 

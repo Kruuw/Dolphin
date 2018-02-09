@@ -31,7 +31,7 @@ class Joueur
 		Joueur(int s);
 		void Affiche();
 		void get_Pion(std::vector <std::vector <char> > Dam , char P);
-		void Perpion(int x, int y);
+		void Suppression(int x, int y);
 		~Joueur();
 };
 
