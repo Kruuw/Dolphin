@@ -1,6 +1,9 @@
 ﻿#include <string>
+#include <utility>
 #include <iostream>
 
+#include <fstream>
+#include <sstream>
 
 
 #include "Dameo.h"
@@ -26,14 +29,30 @@ using namespace std;
 #define BOLDWHITE   "\033[1m\033[37m"      /* Bold White */
  
 #define CLEAR "\033[2J"  // clear screen escape code 
-const int H = 8;
+int H = 8;
  char P1= 'x';
- char P2= 'o';
-const int ecart_it = 0; /// c'est lécart parametrable entre les deux jopueur
+ char P2= 'o'; // ou < et > pour le mode hard
+int ecart_it = 0; /// c'est lécart parametrable entre les deux jopueur
 string coul1 = BOLDYELLOW;
 string coul2 = BOLDMAGENTA;
 string coul3 = RED;
+
+string border1 = BOLDCYAN;
+string border2 = BOLDWHITE;
+
+int SaisieEntier();
+void ViderBuffer();
+bool verif_p(string p);
+bool verif_p(string p,string p1);
+string choixColor();
+
+
+
 /*--------------------------------------------------------------||||||----------La MAP-------*/
+
+
+
+
 Damier::Damier()
 {
 	Dam.resize( H , vector<char>( H , '0' ) );
@@ -44,7 +63,6 @@ Damier::~Damier()
 }
 void Damier::Remplir_plateau()
 {
-	nbpion = 0;
 	int t = Dam.size()-1; 	//Taille tableau
 	int T = Dam.size();
 	int med, row, xow;
@@ -99,47 +117,53 @@ void Damier::Remplir_plateau()
 
 void Damier::Affiche()
 {
+	for(int h = 0; h<=Dam.size()-1; h++)	cout<<"  "<<h<<"  ";
+	cout<<endl;
 	for(int i = 0 ; i<=Dam.size()-1 ; i++)
 	{
+		
 		for(int deco=0; deco<= Dam.size()-1; deco++)
 		{
 			
 			if(i % 2 == 0 && deco % 2 == 0 || i % 2 != 0 && deco % 2 != 0) {
-				cout<< BOLDCYAN <<"+---+"<<RESET;
+				cout<< border1 <<"+---+"<<RESET;
 				}
 			else{
-					cout<< BOLDWHITE <<"+---+"<<RESET;
+					cout<< border2 <<"+---+"<<RESET;
 				}
 		}	
 		cout<<endl;
+
 		for(int j = 0; j<=Dam.size()-1 ;j++)
 		{
 			if(i % 2 == 0 && j % 2 == 0 || i % 2 != 0 && j % 2 != 0) {
-			cout<< BOLDCYAN <<"| " <<RESET;
+			cout<< border1 <<"| " <<RESET;
 			Affiche_Couleur(i,j);
-			cout << BOLDCYAN <<" |"<< RESET;
+			cout << border1 <<" |"<< RESET;
 			}
 			else {
-     		cout << BOLDWHITE<<"| "<<RESET ;
+     		cout << border2 <<"| "<<RESET ;
      		Affiche_Couleur(i,j) ;
-     		cout<<BOLDWHITE<<" |" << RESET;
+     		cout<< border2 <<" |" << RESET;
      		}
 		}
+		cout<<"	|"<<i;
 		cout<<endl;
 	}
 		for(int deco2=0; deco2<= Dam.size()-1; deco2++)
 		{
 			if(deco2 % 2 != 0 ) {
 
-				cout<< BOLDCYAN<<"+---+"<<RESET;
+				cout<< border1 <<"+---+"<<RESET;
 				}
 			else{
-				cout<< BOLDWHITE <<"+---+"<<RESET;
+				cout<< border2 <<"+---+"<<RESET;
 				}
 		}
 			cout<<endl;
 		
 }
+
 int Damier::getP()
 {
 	int pions =0;
@@ -168,6 +192,16 @@ char Damier::Affiche_Couleur(int i, int j)
 		if(Dam[i][j] == P1)	cout<<coul1<<Dam[i][j]<<RESET;
 	}
 	else	cout<< ' ';
+}
+
+void Damier::Suppression(int x, int y)
+{
+	if(Dam[x][y] != '0'){
+		Dam[x][y] = '0';
+		cout <<"lol";
+		}
+	else cout<<endl<<"Erreur de traitement !"<<endl;
+
 }
 //---------------------------------------------------------|||||||||||------------Le joueur-------------------------
 //---------------------------------------------------------|||||||||||||-----------------------------------------------------------
@@ -205,8 +239,8 @@ void Joueur::get_Pion(vector <vector<char> > S, char P)
 		for(int j=0; j<= S.size()-1 ; j++)
 		{
 			if(S[i][j] == P){
-				Tion[pions].first.first = i;
-				Tion[pions].first.second = j;
+				this->Tion[pions].first.first = i;
+				this->Tion[pions].first.second = j;
 				pions++;
 				}
 		}
@@ -221,10 +255,12 @@ void Joueur::Suppression(int x, int y)
 	{
 		if(Tion[i].first.first == x && Tion[i].first.second == y)
 		{
-			Tion[i].first.first = Tion[this->pion-1].first.first ;
-			Tion[i].first.second = Tion[this->pion-1].first.second ;
-			Tion[i].second = Tion[this->pion-1].second ;
+			cout<<"		Le pion ("<<x<<","<<y<<")"<<endl;
+				Tion[i].first.first = Tion[pion-1].first.first ;
+				Tion[i].first.second = Tion[pion-1].first.second ;
+			Tion[i].second = Tion[pion-1].second ;
 			Tion.pop_back();
+
 		}
 	}
 }
@@ -236,13 +272,14 @@ void Joueur::save(int x , int y , char P)
 }
 */
 
+void estDame(int)
+{
 
 
-
-
+}
 
 int main()
-{    	
+{    /*	
 		Damier Dameo;
 	//	Dameo.Affiche();
 		Dameo.Remplir_plateau();
@@ -253,14 +290,196 @@ int main()
 		cout <<serv<<endl;
 
  		Joueur J1(serv);
- 	//	Joueur J2(serv);
+ 		Joueur J2(serv);
  		
  		J1.get_Pion(Size, P1);
- 	//	J2.get_Pion(Size, P2);
+ 		J2.get_Pion(Size, P2);
+ 		//system('clear');
+ 		J1.Suppression(5,5);
+ 		Dameo.Suppression(5,5);
+
  		J1.Affiche();
- 		J1.Suppression(6,5);
- 		J1.Affiche();
-		cout << endl;
+ 		Dameo.Affiche();
+
+		cout << endl;*/
+	int tour=0;
+	int choix;
+	bool condition = false;
+	string joueur1;
+	string joueur2;
+	cout<<BOLDBLACK<<"Hello world !"<<RESET<<endl;
+	do{
+		cout<<"1/ nouvelle partie"<<endl;
+		cout<<"2/ continuez"<<endl;
+		cin>>choix;
+	}while(choix > 2 || choix < 1);
+	//if(choix == 1){
+		cout<<"Taille du plateau : " ; // Et aussi rajouté l'écart inter pion changeable;
+		cin>>H;
+		while(H >20 || H < 6){
+			cout<<"Taille du plateau : " ; // Et aussi rajouté l'écart inter pion changeable;
+			cin>>H;
+		}
+		Damier Dameo;
+		system("clear");
+		Dameo.Affiche();
+		//Dameo->Remplir_plateau();
+
+		cout<<"Joueurs 1:?";
+		cin>>joueur1;
+		string p1;
+		cout<<"Votre Pion:  s u a y w x o i m k h g v z ";
+		cin>>p1;
+		cout<<endl;
+		while(!verif_p(p1)){
+			cout<<"Erroné! Pion:?";
+			cin>>p1;
+		};
+		cout<<"Joueurs 2:?";
+		cin>>joueur2;
+		string p2;
+		cout<<"Votre Pion:  s u a y w x o i m k h g v z ";
+		cin>>p2;
+		cout<<endl;
+		while(!verif_p(p2,p1)){
+			cout<<"Erroné! Pion:?";
+			cin>>p2;
+		}
+		P1=p1[0];
+		P2=p2[0];
+		system("clear");
+		coul1 = choixColor();
+		coul2 = choixColor();
+		Dameo.Remplir_plateau();
+
+		/*
+		}
+	elseif(choix==2){
+		/* le jeu chargé par fichier txt */
+		/*
+	}
+
+	elseif(choix == 3){
+		cout <<endl;
+		cout<<"Parametre : ";
+		/*choix entre 3 pair de choix de couleur*/
+
+	//}
+	/*					le jeu					*/
+		
+		Dameo.Affiche();
+
+		vector <vector<char> > Size = Dameo.get_DamSize();
+		int serv = Dameo.getP();
+		cout <<serv<<endl;
+
+ 		Joueur J1(serv);
+ 		Joueur J2(serv);
+ 		
+ 		J1.get_Pion(Size, P1);
+ 		J2.get_Pion(Size, P2);
+		char P=P1;
+		do{	
+			if(P == P1)
+			{
+				tour++;
+			}
+		cout<<"#--------------------------#Tour"<<tour<<"#-----------------------#"<<endl;
+		Dameo.Remplir_plateau();
+		Dameo.Affiche();
+		
+		system("clear");
+		
+	}while(condition == false);
 
     return 0;
- }
+}
+
+
+
+string choixColor()
+{
+	int choix;
+	cout<<BOLDYELLOW<<"1: couleur jaune"<<RESET<<endl;
+	cout<<BOLDRED<<"2: couleur rouge"<<RESET<<endl;
+	cout<<BOLDGREEN<<"3: couleur vert"<<RESET<<endl;
+	cout<<BOLDBLUE<<"4: couleur bleu"<<RESET<<endl;
+	cout<<BOLDMAGENTA<<"5: couleur Magenta??"<<RESET<<endl;
+	do{
+			cout<<"Votre couleur : " ; // Et aussi rajouté l'écart inter pion changeable;
+			cin>> choix;
+	}while(choix > 5 || choix < 1);
+	switch(choix){
+			case 1 : return BOLDYELLOW;
+			case 2 : return BOLDRED;
+			case 3 : return BOLDGREEN;
+			case 4 : return BOLDBLUE;
+			case 5 : return BOLDMAGENTA;
+			default : return BOLDYELLOW;
+			}
+} 
+
+bool verif_p(string p)
+{
+	if(p.size() > 1)	return false;
+	else{
+		if(p[0] == 's' || p[0] == 'u'|| p[0] == 'a'|| p[0] == 'y'|| p[0] == 'w'|| p[0] == 'x'|| p[0] == 'o'|| p[0] == 'i'|| p[0] == 'm'|| p[0] == 'k'|| p[0] == 'h'|| p[0] == 'g'|| p[0] == 'v'|| p[0] == 'z'){
+			return true;
+		}
+		else return false;
+	}
+}
+
+bool verif_p(string p, string p1)
+{
+	if(p.size() > 1)	return false;
+	else{
+	if(p == p1)	return false;
+	else {
+				if(p[0] == 's' || p[0] == 'u'|| p[0] == 'a'|| p[0] == 'y'|| p[0] == 'w'|| p[0] == 'x'|| p[0] == 'o'|| p[0] == 'i'|| p[0] == 'm'|| p[0] == 'k'|| p[0] == 'h'|| p[0] == 'g'|| p[0] == 'v'|| p[0] == 'z'){
+				return true;
+			}
+		else return false;
+		}
+	}
+}
+
+void ViderBuffer()
+{
+	
+    cin.clear();
+   // cin.ignore(numeric_limits<streamsize>::max(), '\n');
+}
+
+int SaisieEntier()
+{
+    int nombre;
+    while(true)
+    {
+
+        cin >> nombre;
+ 
+        if(cin.eof() || cin.bad())                      //Vérifie si la saisie s'est faite correctement
+        {
+            cerr << "Une erreur interne est survenue." << endl;
+            if(cin.eof())
+                break;
+            ViderBuffer();
+            continue;
+        }
+        else if(cin.fail())                             //Vérifie si le type de la saisie correspond à celui attendu
+        {
+            cerr << "Erreur, saisie incorrecte!" << endl;
+            ViderBuffer();
+            continue;
+        }
+        else if(nombre<0 || nombre>H-1)             //Vérifie si la variable est dans le bon interval
+        {
+            cerr << "Erreur : entrer une valeur entre 0 et " << H-1 << " !" << endl;
+            ViderBuffer();
+            continue;
+        }
+        break;
+    }
+    return nombre;
+}

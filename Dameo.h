@@ -17,6 +17,7 @@ class Damier
 		void Remplir_plateau();
 		std::vector <std::vector <char> > get_DamSize();
 		int getP();
+		void Suppression(int x, int y);
 		~Damier();
 
 };
